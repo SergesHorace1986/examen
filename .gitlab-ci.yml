@@ -17,7 +17,7 @@ services:
   - docker:24.0.5-dind
 
 before_script:
-  - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+  - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 
 # 🔨 Build
 build:
