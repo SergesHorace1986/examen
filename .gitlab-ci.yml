@@ -39,12 +39,15 @@ test:
     - echo "Run tests here"
 
 .deploy_template:
-  image: bitnami/kubectl:latest
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   before_script:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
   script:
-    - kubectl set image deployment/my-app my-app=$DOCKERHUB_USERNAME/examen:$TAG -n $KUBE_NAMESPACE || true
+    - kubectl version --client
+    - kubectl set image deployment/my-app my-app=$DOCKERHUB_USERNAME/examen -n $KUBE_NAMESPACE || true
     - kubectl apply -f k8s/$ENV/
     - kubectl rollout status deployment/my-app -n $KUBE_NAMESPACE
 
