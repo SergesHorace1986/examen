@@ -44,10 +44,11 @@ test:
     entrypoint: [""]
   before_script:
     - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - cp "$KUBE_CONFIG" ~/.kube/config
   script:
     - kubectl version --client
     - kubectl set image deployment/my-app my-app=$DOCKERHUB_USERNAME/examen -n $KUBE_NAMESPACE || true
+    - kubectl get nodes
     - kubectl apply -f k8s/$ENV/
     - kubectl rollout status deployment/my-app -n $KUBE_NAMESPACE
 
