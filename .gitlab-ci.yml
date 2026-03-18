@@ -1,3 +1,4 @@
+
 stages:
   - build
   - push
@@ -16,7 +17,7 @@ build:
   before_script:
   - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
   script:
-    - - docker build -f docker/Dockerfile -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
+    - - docker -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
 
 # 📦 Push image
 push:
