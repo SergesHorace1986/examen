@@ -8,7 +8,10 @@ stages:
   - deploy_prod
 
 variables:
-  IMAGE_NAME: $DOCKERHUB_USERNAME/skyblue-app
+  IMAGE_NAME: docker:24.0.5
+
+services:
+  - docker:24.0.5-dind
 
 before_script:
   - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -17,7 +20,7 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA .
+    - docker build -t $IMAGE_NAME .
   only:
     - branches
 
@@ -33,7 +36,7 @@ test:
 push:
   stage: push
   script:
-    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+    - docker push $IMAGE_NAME
   only:
     - branches
 
