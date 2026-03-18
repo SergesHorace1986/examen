@@ -7,8 +7,11 @@ stages:
   - deploy_staging
   - deploy_prod
 
+image: docker:24.0.5
+
 variables:
-  IMAGE_NAME: docker:24.0.5
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
 
 services:
   - docker:24.0.5-dind
@@ -20,7 +23,7 @@ before_script:
 build:
   stage: build
   script:
-    - docker build -t $IMAGE_NAME .
+    - docker build -t horacio1986/examen:latest .
   only:
     - branches
 
@@ -36,7 +39,7 @@ test:
 push:
   stage: push
   script:
-    - docker push $IMAGE_NAME
+    - docker push horacio1986/examen:latest
   only:
     - branches
 
