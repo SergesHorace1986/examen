@@ -1,45 +1,38 @@
 stages:
   - build
-  - test
   - push
+  - test
   - deploy_dev
   - deploy_qa
   - deploy_staging
   - deploy_prod
 
-image: docker:24.0.5
-
-variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-
-services:
-  - docker:24.0.5-dind
-
-before_script:
-  - echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
-
 # 🔨 Build
 build:
   stage: build
+  image: docker:29.3.0-cli
+  services:
+  - docker:29.3-dind
+  before_script:
+  - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
   script:
-    - docker build -t horacio1986/examen:latest .
-  only:
-    - branches
+    - docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
+
+# 📦 Push image
+push:
+  stage: push
+  script:
+    - docker push $DOCKERHUB_USER_NAME/$DOCKERHUB_PROJECT:$TAG
+  after_script:
+    - docker images
+  needs:
+    - build
 
 # 🧪 Test
 test:
   stage: test
   script:
     - echo "Run tests here"
-  only:
-    - branches
-
-# 📦 Push image
-push:
-  stage: push
-  script:
-    - docker push horacio1986/examen:latest
   only:
     - branches
 
