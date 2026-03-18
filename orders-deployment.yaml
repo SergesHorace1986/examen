@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert -f docker-compose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: orders
+  name: orders
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: orders
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: /snap/kompose/19/kompose-linux-amd64 convert -f docker-compose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: orders
+    spec:
+      containers:
+      - args:
+        - sh
+        - -c
+        - uvicorn main:app --reload --host 0.0.0.0
+        image: baranbartu/k-orders:latest
+        imagePullPolicy: ""
+        name: orders
+        resources: {}
+        volumeMounts:
+        - mountPath: /app
+          name: orders-claim0
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes:
+      - name: orders-claim0
+        persistentVolumeClaim:
+          claimName: orders-claim0
+status: {}

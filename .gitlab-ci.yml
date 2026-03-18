@@ -1,0 +1,82 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy_dev
+  - deploy_qa
+  - deploy_staging
+  - deploy_prod
+
+variables:
+  IMAGE_NAME: $DOCKERHUB_USERNAME/skyblue-app
+
+before_script:
+  - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
+# 🔨 Build
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_SHA .
+  only:
+    - branches
+
+# 🧪 Test
+test:
+  stage: test
+  script:
+    - echo "Run tests here"
+  only:
+    - branches
+
+# 📦 Push image
+push:
+  stage: push
+  script:
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHA
+  only:
+    - branches
+
+# 🚀 Deploy DEV
+deploy_dev:
+  stage: deploy_dev
+  script:
+    - kubectl config set-cluster kubernetes --server=$KUBE_URL
+    - echo $KUBE_CONFIG | base64 -d > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl apply -f k8s/dev/
+  environment:
+    name: dev
+  only:
+    - develop
+
+# 🚀 Deploy QA
+deploy_qa:
+  stage: deploy_qa
+  script:
+    - kubectl apply -f k8s/qa/
+  environment:
+    name: qa
+  only:
+    - qa
+
+# 🚀 Deploy STAGING
+deploy_staging:
+  stage: deploy_staging
+  script:
+    - kubectl apply -f k8s/staging/
+  environment:
+    name: staging
+  only:
+    - staging
+
+# 🚀 Deploy PROD (manual)
+deploy_prod:
+  stage: deploy_prod
+  script:
+    - kubectl apply -f k8s/prod/
+  environment:
+    name: production
+  only:
+    - main
+  when: manual
