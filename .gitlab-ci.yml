@@ -17,13 +17,13 @@ build:
   before_script:
   - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
   script:
-    - - docker -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
+  - docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
 
 # 📦 Push image
 push:
   stage: push
   script:
-    - docker push $DOCKERHUB_USER_NAME/$DOCKERHUB_PROJECT:$TAG
+    - docker push $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG
   after_script:
     - docker images
   needs:
