@@ -51,7 +51,6 @@ test:
     - kubectl apply -f k8s/$ENV/
     - kubectl rollout status deployment/my-app -n $KUBE_NAMESPACE
 
-
 # 🚀 Deploy DEV
 deploy_dev:
   stage: deploy_dev
