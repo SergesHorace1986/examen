@@ -10,7 +10,6 @@ variables:
 
 stages:
   - build
-  - push
   - test
   - deploy_dev
   - deploy_qa
@@ -18,25 +17,20 @@ stages:
   - deploy_prod
 
 # 🔨 Build
-build:
+build and push:
   stage: build
-  image: docker:29.3.0-cli
-  services:
-  - docker:29.3-dind
-  before_script:
+  script:
+  # Login to Docker Hub
   - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-  script:
-  - docker build -t $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG .
 
-# 📦 Push image
-push:
-  stage: push
-  script:
-    - docker push $DOCKERHUB_USERNAME/$DOCKERHUB_PROJECT:$TAG
-  after_script:
-    - docker images
-  needs:
-    - build
+  # Build image
+  - docker build -t $DOCKERHUB_USERNAME/examen:$TAG .
+  
+  # Verify image exists (debug)
+  - docker images
+
+  # 📦 Push image to Docker Hub
+  - docker push $DOCKERHUB_USERNAME/examen:$TAG
 
 # 🧪 Test
 test:
