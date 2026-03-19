@@ -7,7 +7,7 @@ variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
   variables:
-  IMAGE: $DOCKER_USERNAME/skyblue-app
+  IMAGE: $DOCKERHUB_USERNAME/skyblue-app
 
 stages:
   - build
@@ -20,7 +20,7 @@ stages:
 
 before_script:
   # Login to Docker Hub
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
 # 🔨 Build
 build:
@@ -31,8 +31,6 @@ build:
   
   # Verify image exists (debug)
   - docker images
-
-  
 
 # 🧪 Test
 test:
