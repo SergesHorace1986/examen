@@ -38,58 +38,31 @@ test:
   script:
     - echo "Run tests here"
 
-.deploy_template:
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  before_script:
-    - mkdir -p ~/.kube
-    - cp "$KUBE_CONFIG" ~/.kube/config
-  script:
-    - kubectl version --client
-    - kubectl set image deployment/my-app my-app=$DOCKERHUB_USERNAME/examen -n $KUBE_NAMESPACE || true
-    - kubectl get nodes
-    - kubectl apply -f k8s/$ENV/
-    - kubectl rollout status deployment/my-app -n $KUBE_NAMESPACE
-
-# 🚀 Deploy DEV
 deploy_dev:
   stage: deploy_dev
-  extends: .deploy_template
-  variables:
-    ENV: dev
-    KUBE_NAMESPACE: dev
-  environment:
-    name: dev
+  script:
+    - kubectl apply -f k8s/dev/
+  only:
+    - dev
 
-# 🚀 Deploy QA
 deploy_qa:
   stage: deploy_qa
-  extends: .deploy_template
-  variables:
-    ENV: qa
-    KUBE_NAMESPACE: qa
-  environment:
-    name: qa
+  script:
+    - kubectl apply -f k8s/qa/
+  only:
+    - qa
 
-# 🚀 Deploy STAGING
 deploy_staging:
   stage: deploy_staging
-  extends: .deploy_template
-  variables:
-    ENV: staging
-    KUBE_NAMESPACE: staging
-  environment:
-    name: staging
-  when: manual
+  script:
+    - kubectl apply -f k8s/staging/
+  only:
+    - staging
 
-# 🚀 Deploy PROD (manual)
 deploy_prod:
   stage: deploy_prod
-  extends: .deploy_template
-  variables:
-    ENV: prod
-    KUBE_NAMESPACE: prod
-  environment:
-    name: production
+  script:
+    - kubectl apply -f k8s/prod/
+  only:
+    - main
   when: manual
