@@ -54,7 +54,9 @@ test:
 # 🚀 Deploy DEV
 deploy_dev:
   stage: deploy
-  image: alpine/helm:latest
+  image:
+    name: alpine/helm:latest
+    entrypoint: [""]
   script:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" > ~/.kube/config
@@ -65,7 +67,9 @@ deploy_dev:
 #🚀 Deploy QA
 deploy_qa:
   stage: deploy
-  image: alpine/helm:latest
+  image:
+    name: alpine/helm:latest
+    entrypoint: [""]
   script:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" > ~/.kube/config
@@ -76,7 +80,9 @@ deploy_qa:
 # 🚀 Deploy STAGING
 deploy_staging:
   stage: deploy
-  image: alpine/helm:latest
+  image:
+    name: alpine/helm:latest
+    entrypoint: [""]
   script:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" > ~/.kube/config
@@ -87,7 +93,9 @@ deploy_staging:
 # 🚨 Deploy PROD (manual)
 deploy_prod:
   stage: deploy
-  image: alpine/helm:latest
+  image:
+    name: alpine/helm:latest
+    entrypoint: [""]
   script:
     - mkdir -p ~/.kube
     - echo "$KUBE_CONFIG" > ~/.kube/config
