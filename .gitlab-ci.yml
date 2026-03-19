@@ -57,7 +57,9 @@ test:
 # 🚀 Deploy DEV
 deploy_dev:
   stage: deploy_dev
-  image: bitnami/kubectl:latest
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
     - kubectl apply -f k8s/dev/
   only:
@@ -66,7 +68,9 @@ deploy_dev:
 #🚀 Deploy QA
 deploy_qa:
   stage: deploy_qa
-  image: bitnami/kubectl:latest
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
     - kubectl apply -f k8s/qa/
   only:
@@ -75,7 +79,9 @@ deploy_qa:
 # 🚀 Deploy STAGING
 deploy_staging:
   stage: deploy_staging
-  image: bitnami/kubectl:latest
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
     - kubectl apply -f k8s/staging/
   only:
@@ -84,7 +90,9 @@ deploy_staging:
 # 🚨 Deploy PROD (manual)
 deploy_prod:
   stage: deploy_prod
-  image: bitnami/kubectl:latest
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
     - kubectl apply -f k8s/prod/
   only:
