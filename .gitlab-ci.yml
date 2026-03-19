@@ -1,49 +1,58 @@
-image: docker:29.3.0-cli
-
-services:
-  - docker:29.3-dind
+image: node:alpine
 
 variables:
-  DOCKER_HOST: tcp://docker:2375/
-  DOCKER_TLS_CERTDIR: ""
-  variables:
   IMAGE: $DOCKERHUB_USERNAME/skyblue-app
 
 stages:
   - build
   - test
-  - push
   - deploy_dev
   - deploy_qa
   - deploy_staging
   - deploy_prod
 
-before_script:
-  # Login to Docker Hub
-  - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+# install dependencies 
+install:
+  stage: build
+  script:
+    - echo "Install run.."
+    - npm install
+  after_script:
+    - ls -la
 
-# 🔨 Build
+# build the application   
 build:
   stage: build
   script:
-   # Build image
-  - docker build -t $IMAGE:$CI_COMMIT_SHORT_SHA .
-  
-  # Verify image exists (debug)
-  - docker images
+    - echo "build run..."
+    - npm run ci
+  after_script:
+    - ls -la
+  needs:
+    - install
+
+# 🔨 Build image
+build-docker-image:
+  stage: build
+  image: docker:29.3.0-cli
+  services:
+    - docker:29.3-dind
+  before_script:
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+  script:
+   - echo "push docker image..."
+   - docker build -t $IMAGE:$CI_COMMIT_SHORT_SHA .
+   - docker push $IMAGE:$CI_COMMIT_SHORT_SHA
+  after_script:
+    - docker images
+  needs:
+    - build
 
 # 🧪 Test
 test:
   stage: test
   script:
     - echo "Run tests here"
-
-# 📤 Push image
-push:
-  stage: push
-  script:
-    # 📦 Push image to Docker Hub
-  - docker push $IMAGE:$CI_COMMIT_SHORT_SHA
 
 # 🚀 Deploy DEV
 deploy_dev:
