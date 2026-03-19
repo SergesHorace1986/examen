@@ -6,10 +6,7 @@ variables:
 stages:
   - build
   - test
-  - deploy_dev
-  - deploy_qa
-  - deploy_staging
-  - deploy_prod
+  - deploy
 
 # install dependencies 
 install:
@@ -56,45 +53,45 @@ test:
 
 # 🚀 Deploy DEV
 deploy_dev:
-  stage: deploy_dev
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
+  stage: deploy
+  image: alpine/helm:latest
   script:
-    - kubectl apply -f k8s/dev/
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - helm upgrade --install examen ./examen-chart -f examen-chart/values-dev.yaml -n dev
   only:
-    - dev
+    - develop
 
 #🚀 Deploy QA
 deploy_qa:
-  stage: deploy_qa
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
+  stage: deploy
+  image: alpine/helm:latest
   script:
-    - kubectl apply -f k8s/qa/
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - helm upgrade --install examen ./examen-chart -f examen-chart/values-qa.yaml -n qa
   only:
     - qa
 
 # 🚀 Deploy STAGING
 deploy_staging:
-  stage: deploy_staging
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
+  stage: deploy
+  image: alpine/helm:latest
   script:
-    - kubectl apply -f k8s/staging/
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - helm upgrade --install examen ./examen-chart -f examen-chart/values-staging.yaml -n staging
   only:
     - staging
 
 # 🚨 Deploy PROD (manual)
 deploy_prod:
-  stage: deploy_prod
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
+  stage: deploy
+  image: alpine/helm:latest
   script:
-    - kubectl apply -f k8s/prod/
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" > ~/.kube/config
+    - helm upgrade --install examen ./examen-chart -f examen-chart/values-prod.yaml -n prod
   only:
     - main
   when: manual
