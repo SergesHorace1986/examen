@@ -6,31 +6,33 @@ services:
 variables:
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_TLS_CERTDIR: ""
-  TAG: latest
+  variables:
+  IMAGE: $DOCKER_USERNAME/skyblue-app
 
 stages:
   - build
   - test
+  - push
   - deploy_dev
   - deploy_qa
   - deploy_staging
   - deploy_prod
 
+before_script:
+  # Login to Docker Hub
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
 # 🔨 Build
-build and push:
+build:
   stage: build
   script:
-  # Login to Docker Hub
-  - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-
-  # Build image
-  - docker build -t $DOCKERHUB_USERNAME/examen:$TAG .
+   # Build image
+  - docker build -t $IMAGE:$CI_COMMIT_SHORT_SHA .
   
   # Verify image exists (debug)
   - docker images
 
-  # 📦 Push image to Docker Hub
-  - docker push $DOCKERHUB_USERNAME/examen:$TAG
+  
 
 # 🧪 Test
 test:
@@ -38,29 +40,44 @@ test:
   script:
     - echo "Run tests here"
 
+# 📤 Push image
+push:
+  stage: push
+  script:
+    # 📦 Push image to Docker Hub
+  - docker push $IMAGE:$CI_COMMIT_SHORT_SHA
+
+# 🚀 Deploy DEV
 deploy_dev:
   stage: deploy_dev
+  image: bitnami/kubectl:latest
   script:
     - kubectl apply -f k8s/dev/
   only:
     - dev
 
+#🚀 Deploy QA
 deploy_qa:
   stage: deploy_qa
+  image: bitnami/kubectl:latest
   script:
     - kubectl apply -f k8s/qa/
   only:
     - qa
 
+# 🚀 Deploy STAGING
 deploy_staging:
   stage: deploy_staging
+  image: bitnami/kubectl:latest
   script:
     - kubectl apply -f k8s/staging/
   only:
     - staging
 
+# 🚨 Deploy PROD (manual)
 deploy_prod:
   stage: deploy_prod
+  image: bitnami/kubectl:latest
   script:
     - kubectl apply -f k8s/prod/
   only:

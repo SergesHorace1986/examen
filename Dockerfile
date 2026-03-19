@@ -1,11 +1,23 @@
-# Dockerfile
-FROM ruby:3.1
+# ------------------------- Build stage ------------------------- 
+FROM node:20 AS build
 
 WORKDIR /app
+
+COPY package*.json .
+
+RUN npm install
+
 COPY . .
 
-# Only install bundler if you have a Gemfile
-RUN gem install bundler || true
+# RUN npm run build
 
-ENV APP_THEME_COLOR=skyblue
-CMD ["irb"]
+# ------------------------ Runtime stage ------------------------
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=build /app .
+
+EXPOSE 3000
+
+CMD ["node", "src/index.js"]
