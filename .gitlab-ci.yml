@@ -63,7 +63,7 @@ test:
     entrypoint: [""]
   before_script:
     - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - printf "%s" "$KUBE_CONFIG" | base64 -d > ~/.kube/config
     - kubectl cluster-info
   script:
     - helm upgrade --install examen ./examen-chart \
