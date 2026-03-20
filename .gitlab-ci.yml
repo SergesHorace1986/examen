@@ -84,6 +84,7 @@ deploy_dev:
     ENV: dev
   only:
     - dev
+  
 
 #🚀 Deploy QA
 deploy_qa:
