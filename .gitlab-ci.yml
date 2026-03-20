@@ -59,7 +59,7 @@ test:
 .deploy_template: &deploy_template
   stage: deploy
   image:
-    name: lachlanevenson/k8s-helm:latest
+    name: dtzar/helm-kubectl:latest
     entrypoint: [""]
   before_script:
     - mkdir -p ~/.kube
