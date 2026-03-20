@@ -45,61 +45,68 @@ build-docker-image:
   needs:
     - build
 
-# 🧪 Test
+# -----------------------
+# 🧪 TEST STAGE
+# -----------------------
 test:
   stage: test
   script:
     - echo "Run tests here"
 
-# 🚀 Deploy DEV
-deploy_dev:
+# -----------------------
+# 🚀 DEPLOY TEMPLATE
+# -----------------------
+.deploy_template: &deploy_template
   stage: deploy
   image:
-    name: alpine/helm:latest
+    name: lachlanevenson/k8s-helm:latest
     entrypoint: [""]
-  script:
+  before_script:
     - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" > ~/.kube/config
-    - helm upgrade --install examen ./examen-chart -f examen-chart/values-dev.yaml -n dev
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+    - kubectl cluster-info
+  script:
+    - helm upgrade --install examen ./examen-chart \
+        -f examen-chart/values-$ENV.yaml \
+        -n $ENV \
+        --set image.repository=$IMAGE \
+        --set image.tag=$CI_COMMIT_SHORT_SHA \
+        --create-namespace
+
+# -----------------------
+# 🚀 ENVIRONMENTS
+# -----------------------
+
+# 🚀 Deploy DEV
+deploy_dev:
+  <<: *deploy_template
+  variables:
+    ENV: dev
   only:
-    - develop
+    - dev
 
 #🚀 Deploy QA
 deploy_qa:
-  stage: deploy
-  image:
-    name: alpine/helm:latest
-    entrypoint: [""]
-  script:
-    - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" > ~/.kube/config
-    - helm upgrade --install examen ./examen-chart -f examen-chart/values-qa.yaml -n qa
+  <<: *deploy_template
+  variables:
+    ENV: qa
   only:
     - qa
 
 # 🚀 Deploy STAGING
 deploy_staging:
-  stage: deploy
-  image:
-    name: alpine/helm:latest
-    entrypoint: [""]
-  script:
-    - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" > ~/.kube/config
-    - helm upgrade --install examen ./examen-chart -f examen-chart/values-staging.yaml -n staging
+  <<: *deploy_template
+  variables:
+    ENV: staging
   only:
     - staging
 
 # 🚨 Deploy PROD (manual)
 deploy_prod:
-  stage: deploy
-  image:
-    name: alpine/helm:latest
-    entrypoint: [""]
-  script:
-    - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" > ~/.kube/config
-    - helm upgrade --install examen ./examen-chart -f examen-chart/values-prod.yaml -n prod
+  <<: *deploy_template
+  variables:
+    ENV: prod
+  when: manual
   only:
     - main
-  when: manual
+   
