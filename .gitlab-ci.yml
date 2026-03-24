@@ -109,5 +109,4 @@ deploy_prod:
     ENV: prod
   when: manual
   only:
-    - main
    
